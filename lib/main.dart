@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:mobile_app/gen_l10n/app_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -17,6 +19,9 @@ Future<void> main() async {
 
   // Register all the models and services before the app starts
   await setupLocator();
+
+  // Init Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Init Hive
   await locator<DatabaseService>().init();

@@ -1,6 +1,7 @@
 import 'package:mobile_app/enums/view_state.dart';
 import 'package:mobile_app/locator.dart';
 import 'package:mobile_app/models/failure_model.dart';
+import 'package:mobile_app/services/fcm_service.dart';
 import 'package:mobile_app/services/API/users_api.dart';
 import 'package:mobile_app/services/local_storage_service.dart';
 import 'package:mobile_app/viewmodels/base_viewmodel.dart';
@@ -25,6 +26,9 @@ class SignupViewModel extends BaseModel {
 
       // save current user to local storage..
       _storage.currentUser = await _userApi.fetchCurrentUser();
+
+      // Sync device push token after auth is established.
+      await locator<FCMService>().syncTokenWithBackend();
 
       setStateFor(SIGNUP, ViewState.Success);
     } on Failure catch (f) {

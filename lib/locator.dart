@@ -12,6 +12,7 @@ import 'package:mobile_app/services/API/country_institute_api.dart';
 import 'package:mobile_app/services/database_service.dart';
 import 'package:mobile_app/services/dialog_service.dart';
 import 'package:mobile_app/services/API/contributors_api.dart';
+import 'package:mobile_app/services/fcm_service.dart';
 import 'package:mobile_app/services/ib_engine_service.dart';
 import 'package:mobile_app/services/local_storage_service.dart';
 import 'package:mobile_app/services/notifications_service.dart';
@@ -70,6 +71,7 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<AssignmentsApi>(() => HttpAssignmentsApi());
   locator.registerLazySingleton<GradesApi>(() => HttpGradesApi());
   locator.registerLazySingleton<FCMApi>(() => HttpFCMApi());
+  locator.registerLazySingleton<FCMService>(() => FCMService());
   locator.registerLazySingleton<CountryInstituteAPI>(
     () => HttpCountryInstituteAPI(),
   );

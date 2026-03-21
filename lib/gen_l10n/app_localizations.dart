@@ -1732,6 +1732,12 @@ abstract class AppLocalizations {
   /// **'your project'**
   String get notifications_your_project;
 
+  /// No description provided for @notifications_generic_activity.
+  ///
+  /// In en, this message translates to:
+  /// **'Activity on your project'**
+  String get notifications_generic_activity;
+
   /// No description provided for @profile_view_not_available.
   ///
   /// In en, this message translates to:

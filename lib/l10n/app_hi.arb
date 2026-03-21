@@ -310,6 +310,7 @@
   "notifications_starred": "स्टार किया",
   "notifications_forked": "फोर्क किया",
   "notifications_your_project": "आपका प्रोजेक्ट",
+  "notifications_generic_activity": "आपके प्रोजेक्ट पर गतिविधि",
 
   "@profile_view": {},
   "profile_view_not_available": "उपलब्ध नहीं",

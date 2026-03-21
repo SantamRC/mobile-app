@@ -28,7 +28,7 @@ class NotificationAttributes {
     this.readAt,
     required this.createdAt,
     required this.updatedAt,
-    required this.params,
+    this.params,
     required this.unread,
   });
 
@@ -39,7 +39,7 @@ class NotificationAttributes {
   DateTime? readAt;
   DateTime createdAt;
   DateTime updatedAt;
-  NotificationParams params;
+  NotificationParams? params;
 
   factory NotificationAttributes.fromJson(Map<String, dynamic> json) {
     return NotificationAttributes(
@@ -49,25 +49,39 @@ class NotificationAttributes {
       readAt: json['read_at'] != null ? DateTime.parse(json['read_at']) : null,
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      params: NotificationParams.fromJson(json['params']),
+      params:
+          json['params'] is Map<String, dynamic>
+              ? NotificationParams.fromJson(json['params'])
+              : null,
       unread: json['unread'],
     );
   }
 }
 
 class NotificationParams {
-  NotificationParams({required this.user, required this.project});
+  NotificationParams({this.user, this.project});
 
-  final User user;
-  final Project project;
+  final User? user;
+  final Project? project;
 
   factory NotificationParams.fromJson(Map<String, dynamic> json) {
-    final Map<String, dynamic> mp = {};
-    mp['id'] = json['user']['id'].toString();
-    mp['attributes'] = json['user'];
+    final userJson = json['user'];
+    final projectJson = json['project'];
+
+    User? user;
+    if (userJson is Map<String, dynamic>) {
+      final Map<String, dynamic> mp = {};
+      mp['id'] = userJson['id']?.toString() ?? '';
+      mp['attributes'] = userJson;
+      user = User.fromJson({'data': mp});
+    }
+
     return NotificationParams(
-      user: User.fromJson({'data': mp}),
-      project: Project.fromJson(json['project']),
+      user: user,
+      project:
+          projectJson is Map<String, dynamic>
+              ? Project.fromJson(projectJson)
+              : null,
     );
   }
 }

@@ -886,6 +886,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get notifications_your_project => 'आपका प्रोजेक्ट';
 
   @override
+  String get notifications_generic_activity => 'आपके प्रोजेक्ट पर गतिविधि';
+
+  @override
   String get profile_view_not_available => 'उपलब्ध नहीं';
 
   @override

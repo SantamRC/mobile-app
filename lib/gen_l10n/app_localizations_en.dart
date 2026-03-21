@@ -881,6 +881,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications_your_project => 'your project';
 
   @override
+  String get notifications_generic_activity => 'Activity on your project';
+
+  @override
   String get profile_view_not_available => 'N.A';
 
   @override

@@ -312,6 +312,7 @@
   "notifications_starred": "starred",
   "notifications_forked": "forked",
   "notifications_your_project": "your project",
+  "notifications_generic_activity": "Activity on your project",
 
   "@profile_view": {},
   "profile_view_not_available": "N.A",

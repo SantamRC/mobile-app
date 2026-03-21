@@ -313,6 +313,7 @@
   "notifications_starred": "مميز",
   "notifications_forked": "منسوخ",
   "notifications_your_project": "مشروعك",
+  "notifications_generic_activity": "نشاط على مشروعك",
 
   "@profile_view": {},
   "profile_view_not_available": "غير متاح",

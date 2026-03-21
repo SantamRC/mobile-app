@@ -872,6 +872,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notifications_your_project => 'مشروعك';
 
   @override
+  String get notifications_generic_activity => 'نشاط على مشروعك';
+
+  @override
   String get profile_view_not_available => 'غير متاح';
 
   @override

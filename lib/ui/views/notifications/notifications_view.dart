@@ -3,6 +3,7 @@ import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_app/cv_theme.dart';
 import 'package:mobile_app/enums/notification_type.dart';
+import 'package:mobile_app/models/notification.dart' as notification_model;
 import 'package:mobile_app/ui/views/base_view.dart';
 import 'package:mobile_app/viewmodels/cv_landing_viewmodel.dart';
 import 'package:mobile_app/viewmodels/notifications/notifications_viewmodel.dart';
@@ -11,6 +12,26 @@ import 'package:mobile_app/gen_l10n/app_localizations.dart';
 
 class NotificationsView extends StatelessWidget {
   const NotificationsView({super.key});
+
+  String _buildNotificationTitle(
+    BuildContext context, {
+    required notification_model.Notification notification,
+    required NotificationType type,
+  }) {
+    final actorName = notification.attributes.params?.user?.data.attributes.name;
+    final projectName = notification.attributes.params?.project?.name;
+
+    if (actorName != null && actorName.isNotEmpty) {
+      if (projectName != null && projectName.isNotEmpty) {
+        return '$actorName '
+            '${type == NotificationType.Fork ? AppLocalizations.of(context)!.notifications_forked : AppLocalizations.of(context)!.notifications_starred} '
+            '${AppLocalizations.of(context)!.notifications_your_project} '
+            '$projectName';
+      }
+    }
+
+    return AppLocalizations.of(context)!.notifications_generic_activity;
+  }
 
   Widget _emptyState(BuildContext context, {required bool hasNoNotifications}) {
     return Padding(
@@ -205,10 +226,11 @@ class NotificationsView extends StatelessWidget {
                               ),
                             ),
                             title: Text(
-                              '${notification.attributes.params.user.data.attributes.name} '
-                              '${type == NotificationType.Fork ? AppLocalizations.of(context)!.notifications_forked : AppLocalizations.of(context)!.notifications_starred} '
-                              '${AppLocalizations.of(context)!.notifications_your_project} '
-                              '${notification.attributes.params.project.name}',
+                              _buildNotificationTitle(
+                                context,
+                                notification: notification,
+                                type: type,
+                              ),
                               style: TextStyle(
                                 fontWeight:
                                     notification.attributes.unread

@@ -5,6 +5,7 @@ import 'package:mobile_app/ui/views/base_view.dart';
 import 'package:mobile_app/ui/views/cv_landing_view.dart';
 import 'package:mobile_app/utils/snackbar_utils.dart';
 import 'package:mobile_app/viewmodels/authentication/auth_options_viewmodel.dart';
+import 'package:mobile_app/viewmodels/authentication/new_auth_options_viewmodel.dart';
 
 class AuthOptionsView extends StatefulWidget {
   const AuthOptionsView({super.key, this.isSignUp = false});
@@ -82,6 +83,16 @@ class _AuthOptionsViewState extends State<AuthOptionsView> {
                       decoration: const BoxDecoration(shape: BoxShape.circle),
                       child: const Icon(FontAwesome5.github, size: 40),
                     ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final userCredential = await signInWithGoogle();
+
+                      if (userCredential != null) {
+                        print("Signed in: ${userCredential.user?.email}");
+                      }
+                    },
+                    child: Text("Sign in with Google"),
                   ),
                 ],
               ),

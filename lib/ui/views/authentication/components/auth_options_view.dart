@@ -18,16 +18,22 @@ class AuthOptionsView extends StatefulWidget {
 
 class _AuthOptionsViewState extends State<AuthOptionsView> {
   late AuthOptionsViewModel _model;
+  late NewAuthOptionsViewModel _newAuthModel;
 
-  Future<void> onGoogleAuthPressed() async {
-    await _model.googleAuth(isSignUp: widget.isSignUp);
+  Future<void> onNewGoogleAuthPressed() async {
+    await _newAuthModel.signInWithGoogle();
 
-    if (_model.isSuccess(_model.GOOGLE_OAUTH)) {
-      await Get.offAllNamed(CVLandingView.id);
-    } else if (_model.isError(_model.GOOGLE_OAUTH)) {
+    if (_newAuthModel.isSuccess(_newAuthModel.FIREBASE_GOOGLE_AUTH)) {
+      final userName = _newAuthModel.getUserName();
       SnackBarUtils.showDark(
-        'Google Authentication Error',
-        _model.errorMessageFor(_model.GOOGLE_OAUTH),
+        'Login Successful',
+        'Welcome ${userName ?? 'User'}!',
+      );
+      await Get.offAllNamed(CVLandingView.id);
+    } else if (_newAuthModel.isError(_newAuthModel.FIREBASE_GOOGLE_AUTH)) {
+      SnackBarUtils.showDark(
+        'Google Sign-In Error',
+        _newAuthModel.errorMessageFor(_newAuthModel.FIREBASE_GOOGLE_AUTH),
       );
     }
   }
@@ -47,10 +53,14 @@ class _AuthOptionsViewState extends State<AuthOptionsView> {
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<AuthOptionsViewModel>(
-      onModelReady: (model) => _model = model,
+    return BaseView<NewAuthOptionsViewModel>(
+      onModelReady: (newAuthModel) {
+        _newAuthModel = newAuthModel;
+        // Initialize the old auth model for GitHub
+        _model = AuthOptionsViewModel();
+      },
       builder:
-          (context, model, child) => Column(
+          (context, newAuthModel, child) => Column(
             children: <Widget>[
               Padding(
                 padding: const EdgeInsetsDirectional.symmetric(horizontal: 32),
@@ -66,16 +76,27 @@ class _AuthOptionsViewState extends State<AuthOptionsView> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   GestureDetector(
-                    onTap: onGoogleAuthPressed,
+                    onTap: onNewGoogleAuthPressed,
                     child: Container(
-                      padding: const EdgeInsetsDirectional.all(8),
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: Image.asset(
-                        'assets/icons/google_icon.png',
-                        height: 40,
+                      padding: const EdgeInsetsDirectional.all(12),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/icons/google_icon.png',
+                            height: 24,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text("Sign in with Google"),
+                        ],
                       ),
                     ),
                   ),
+                  const SizedBox(width: 16),
                   GestureDetector(
                     onTap: onGithubAuthPressed,
                     child: Container(
@@ -83,16 +104,6 @@ class _AuthOptionsViewState extends State<AuthOptionsView> {
                       decoration: const BoxDecoration(shape: BoxShape.circle),
                       child: const Icon(FontAwesome5.github, size: 40),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () async {
-                      final userCredential = await signInWithGoogle();
-
-                      if (userCredential != null) {
-                        print("Signed in: ${userCredential.user?.email}");
-                      }
-                    },
-                    child: Text("Sign in with Google"),
                   ),
                 ],
               ),

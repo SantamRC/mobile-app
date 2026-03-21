@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "328673734674-qdlqb4j4ssfj0u355go5pbpu7j7sd3g2.apps.googleusercontent.com",
+          "client_id": "328673734674-0ni62qmndi8rngelgro7dg41lcfirco0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.circuitverse.mobile_app",
+            "certificate_hash": "c5fc04a8770b314e9ea4326e4a9299ee03682deb"
+          }
+        },
+        {
+          "client_id": "328673734674-c8843huhnbhfki22no0bm2nkbkefmcgb.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,7 +35,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "328673734674-qdlqb4j4ssfj0u355go5pbpu7j7sd3g2.apps.googleusercontent.com",
+              "client_id": "328673734674-c8843huhnbhfki22no0bm2nkbkefmcgb.apps.googleusercontent.com",
               "client_type": 3
             },
             {

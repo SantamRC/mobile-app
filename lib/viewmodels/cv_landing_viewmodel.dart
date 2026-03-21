@@ -4,6 +4,7 @@ import 'package:mobile_app/enums/auth_type.dart';
 import 'package:mobile_app/locator.dart';
 import 'package:mobile_app/models/user.dart';
 import 'package:mobile_app/services/dialog_service.dart';
+import 'package:mobile_app/services/fcm_service.dart';
 import 'package:mobile_app/services/local_storage_service.dart';
 import 'package:mobile_app/gen_l10n/app_localizations.dart';
 import 'package:mobile_app/utils/snackbar_utils.dart';
@@ -15,6 +16,7 @@ class CVLandingViewModel extends BaseModel {
   final DialogService _dialogService = locator<DialogService>();
   final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
   final NotificationsViewModel _viewModel = locator<NotificationsViewModel>();
+  final FCMService _fcmService = locator<FCMService>();
 
   User? _currentUser;
   int _selectedIndex = 0;
@@ -37,10 +39,11 @@ class CVLandingViewModel extends BaseModel {
     notifyListeners();
   }
 
-  void onLogout() async {
+  Future<void> onLogout() async {
     _storage.isLoggedIn = false;
     _storage.currentUser = null;
     _storage.token = null;
+    await _fcmService.clearTokenCache();
 
     // Perform google signout if auth type is google..
     if (_storage.authType == AuthType.GOOGLE) {
@@ -50,10 +53,18 @@ class CVLandingViewModel extends BaseModel {
     notifyListeners();
   }
 
-  void setUser() async {
+  void setUser({int selectedIndex = 0}) async {
     _currentUser = _storage.currentUser;
+
+    _selectedIndex = selectedIndex;
+
+    if (_storage.isLoggedIn) {
+      await _fcmService.syncTokenWithBackend();
+    }
+
     // fetch notifications
     hasPendingNotif = await _viewModel.fetchNotifications();
+    notifyListeners();
   }
 
   void onProfileUpdated() {
@@ -91,7 +102,7 @@ class CVLandingViewModel extends BaseModel {
     );
 
     if (_dialogResponse?.confirmed ?? false) {
-      onLogout();
+      await onLogout();
       selectedIndex = 0;
       SnackBarUtils.showDark(
         AppLocalizations.of(Get.context!)!.cv_logout_success,

@@ -18,8 +18,9 @@ import 'package:mobile_app/viewmodels/cv_landing_viewmodel.dart';
 import 'package:mobile_app/gen_l10n/app_localizations.dart';
 
 class CVLandingView extends StatefulWidget {
-  const CVLandingView({super.key});
+  const CVLandingView({super.key, this.initialIndex = 0});
   static const String id = 'cv_landing_view';
+  final int initialIndex;
 
   @override
   _CVLandingViewState createState() => _CVLandingViewState();
@@ -118,7 +119,8 @@ class _CVLandingViewState extends State<CVLandingView> {
   @override
   Widget build(BuildContext context) {
     return BaseView<CVLandingViewModel>(
-      onModelReady: (model) => model.setUser(),
+      onModelReady:
+          (model) => model.setUser(selectedIndex: widget.initialIndex),
       builder:
           (context, model, child) => PopScope(
             canPop: false,

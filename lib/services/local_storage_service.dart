@@ -15,6 +15,7 @@ class LocalStorageService {
   static const String IS_FIRST_TIME_LOGIN = 'is_first_time_login';
   static const String AUTH_TYPE = 'auth_type';
   static const String IB_SHOWCASE_STATE = 'ib_showcase_state';
+  static const String LAST_SENT_FCM_TOKEN = 'last_sent_fcm_token';
 
   static Future<LocalStorageService> getInstance() async {
     _preferences ??= await SharedPreferences.getInstance();
@@ -99,5 +100,11 @@ class LocalStorageService {
 
   set setShowcaseState(String state) {
     _saveToDisk(IB_SHOWCASE_STATE, state);
+  }
+
+  String? get lastSentFCMToken => _getFromDisk(LAST_SENT_FCM_TOKEN);
+
+  set lastSentFCMToken(String? token) {
+    _saveToDisk(LAST_SENT_FCM_TOKEN, token);
   }
 }

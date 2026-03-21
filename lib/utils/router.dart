@@ -36,7 +36,8 @@ class CVRouter {
       case ForgotPasswordView.id:
         return _buildRoute(const ForgotPasswordView());
       case CVLandingView.id:
-        return _buildRoute(const CVLandingView());
+        final index = settings.arguments as int?;
+        return _buildRoute(CVLandingView(initialIndex: index ?? 0));
       case SimulatorView.id:
         final project = settings.arguments as Project?;
         return _buildRoute(

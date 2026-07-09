@@ -1,16 +1,26 @@
-name: Deploy Web Preview
+name: Web CI
 
 on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches:
+      - master
+      - main
+      - develop
 
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
-  deploy-preview:
+  build-web:
+    name: Build Web
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6
@@ -20,6 +30,19 @@ jobs:
         with:
           channel: "stable"
           flutter-version: 3.44.0
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            **/.dart_tool
+            **/.packages
+            **/.flutter-plugins
+            **/.flutter-plugin-dependencies
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
       - name: Get Dependencies
         run: |
@@ -37,7 +60,15 @@ jobs:
             --dart-define=GITHUB_OAUTH_CLIENT_ID=$GH_OAUTH_CLIENT_ID \
             --dart-define=GITHUB_OAUTH_CLIENT_SECRET=$GH_OAUTH_CLIENT_SECRET
 
+      - name: Upload Web Build
+        uses: actions/upload-artifact@v6
+        with:
+          name: web-build
+          path: build/web/
+          retention-days: 7
+
       - name: Deploy to Netlify
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
         uses: nwtgck/actions-netlify@v3.0
         with:
           publish-dir: './build/web'

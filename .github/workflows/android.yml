@@ -1,0 +1,190 @@
+name: Android CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - develop
+  pull_request:
+    branches:
+      - master
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test & Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: 3.44.0
+
+      - name: Cache pub dependencies
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.pub-cache
+            **/.dart_tool
+            **/.packages
+            **/.flutter-plugins
+            **/.flutter-plugin-dependencies
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Clean and Get Dependencies
+        run: |
+          flutter clean
+          flutter pub get || (flutter pub upgrade --major-versions && flutter pub get)
+
+      - name: Generate Localization Files
+        run: flutter gen-l10n
+
+      - name: Build Runner (Generate Dart Files)
+        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Format Check (Exclude generated files)
+        run: |
+          dart format --set-exit-if-changed \
+            $(find . -name "*.dart" \
+              -not -path "./lib/gen_l10n/*" \
+              -not -path "./.dart_tool/*" \
+              -not -path "./build/*" \
+              -not -name "*.g.dart" \
+              -not -name "*.freezed.dart" \
+              -not -name "*.mocks.dart")
+
+      - name: Analyze Code
+        run: flutter analyze
+
+      - name: Run Tests with Coverage
+        run: flutter test --coverage
+
+      - name: Upload Coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          coverage-reporter-version: v0.6.15
+          fail-on-error: false
+
+  build-android:
+    name: Build Android APK
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    timeout-minutes: 45
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          flutter-version: 3.44.0
+
+      - name: Cache Gradle
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Get Dependencies
+        run: |
+          flutter clean
+          flutter pub get
+          flutter gen-l10n
+          flutter packages pub run build_runner build --delete-conflicting-outputs
+
+      - name: Build APK Debug
+        env:
+          GH_OAUTH_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
+          GH_OAUTH_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
+        run: |
+          flutter build apk --debug \
+            --dart-define=GITHUB_OAUTH_CLIENT_ID=$GH_OAUTH_CLIENT_ID \
+            --dart-define=GITHUB_OAUTH_CLIENT_SECRET=$GH_OAUTH_CLIENT_SECRET
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-debug.apk
+          retention-days: 7
+
+      - name: Create Release Tag
+        if: github.event_name == 'push'
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git tag -a v${{ github.run_number }} -m "Release v${{ github.run_number }}"
+          git push origin v${{ github.run_number }}
+
+      - name: Create Release
+        if: github.event_name == 'push'
+        uses: softprops/action-gh-release@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ github.run_number }}
+          files: build/app/outputs/flutter-apk/app-debug.apk
+
+      - name: Comment PR with APK Link
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = 'build/app/outputs/flutter-apk/app-debug.apk';
+
+            if (fs.existsSync(path)) {
+              const stats = fs.statSync(path);
+              const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
+
+              const comment = `### 📱 Preview APK Ready!\n\n` +
+                `**Size:** ${sizeInMB} MB\n` +
+                `**Build:** #${{ github.run_number }}\n` +
+                `**Commit:** \`${context.sha.substring(0, 7)}\`\n\n` +
+                `Download the APK from the [Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n` +
+                `> ⚠️ This is a preview build for testing purposes only.`;
+
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }

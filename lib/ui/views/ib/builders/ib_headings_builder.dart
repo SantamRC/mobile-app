@@ -17,6 +17,10 @@ class IbHeadingsBuilder extends MarkdownElementBuilder {
   var index = 0;
 
   @override
+  Widget? visitText(md.Text text, TextStyle? preferredStyle) =>
+      const SizedBox.shrink();
+
+  @override
   Widget visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     var text = element.textContent;
 

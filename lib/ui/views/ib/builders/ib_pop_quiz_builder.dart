@@ -11,6 +11,13 @@ class IbPopQuizBuilder extends MarkdownElementBuilder {
   final IbPageViewModel model;
 
   @override
+  bool isBlockElement() => true;
+
+  @override
+  Widget? visitText(md.Text text, TextStyle? preferredStyle) =>
+      const SizedBox.shrink();
+
+  @override
   Widget visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     var _rawContent = element.textContent;
     var _popQuizQuestions = model.fetchPopQuiz(_rawContent);

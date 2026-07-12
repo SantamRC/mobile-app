@@ -8,6 +8,13 @@ class IbChapterContentsBuilder extends MarkdownElementBuilder {
   final Widget? chapterContents;
 
   @override
+  bool isBlockElement() => true;
+
+  @override
+  Widget? visitText(md.Text text, TextStyle? preferredStyle) =>
+      const SizedBox.shrink();
+
+  @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     return chapterContents;
   }

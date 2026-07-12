@@ -13,6 +13,13 @@ class IbInteractionBuilder extends MarkdownElementBuilder {
   final IbPageViewModel model;
 
   @override
+  bool isBlockElement() => true;
+
+  @override
+  Widget? visitText(md.Text text, TextStyle? preferredStyle) =>
+      const SizedBox.shrink();
+
+  @override
   Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     var id = element.textContent;
 
@@ -37,12 +44,10 @@ class IbInteractionBuilder extends MarkdownElementBuilder {
         controller.setNavigationDelegate(
           NavigationDelegate(
             onPageFinished: (String url) async {
-              final height = double.parse(
-                await controller.runJavaScriptReturningResult(
-                      'document.documentElement.scrollHeight;',
-                    )
-                    as String,
+              final result = await controller.runJavaScriptReturningResult(
+                'document.documentElement.scrollHeight;',
               );
+              final height = double.parse(result.toString());
               streamController.add(height);
             },
           ),

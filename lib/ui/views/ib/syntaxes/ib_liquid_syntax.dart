@@ -17,7 +17,7 @@ class IbLiquidSyntax extends md.BlockSyntax {
       if (tags[1] == 'chapter_toc.html') {
         node = md.Element.text('chapter_contents', '');
       } else if (tags[1] == 'image.html' && tags.length >= 3) {
-        // Images
+        // Images - wrap in a paragraph so img is not a top-level inline element
         var url =
             RegExp(r'''url=("|')([^"'\n\r]+)("|')''').firstMatch(match[1]!)![2];
         var alt =
@@ -25,9 +25,11 @@ class IbLiquidSyntax extends md.BlockSyntax {
               r'''description=("|')([^"'\n\r]*)("|')''',
             ).firstMatch(match[1]!)![2];
 
-        node = md.Element.withTag('img');
-        node.attributes['src'] = '${EnvironmentConfig.IB_BASE_URL}$url';
-        node.attributes['alt'] = alt!;
+        final img = md.Element.withTag('img');
+        img.attributes['src'] = '${EnvironmentConfig.IB_BASE_URL}$url';
+        img.attributes['alt'] = alt!;
+        final p = md.Element('p', [img]);
+        node = p;
       } else {
         // Interactions using html
         node = md.Element.text('interaction', tags[1]);

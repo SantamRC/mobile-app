@@ -30,7 +30,7 @@ class IbMdTagSyntax extends md.BlockSyntax {
 
       // Eat all quiz content
       do {
-        quizContent += '\n${parser.current}';
+        quizContent += '\n${parser.current.content}';
         parser.advance();
       } while (parser.next != null || !parser.isDone);
 

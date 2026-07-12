@@ -8,6 +8,13 @@ class IbWebViewBuilder extends MarkdownElementBuilder {
   IbWebViewBuilder();
 
   @override
+  bool isBlockElement() => true;
+
+  @override
+  Widget? visitText(md.Text text, TextStyle? preferredStyle) =>
+      const SizedBox.shrink();
+
+  @override
   Widget visitElementAfter(md.Element element, TextStyle? preferredStyle) {
     var textContent = element.textContent;
 

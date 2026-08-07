@@ -158,17 +158,39 @@ jobs:
               const stats = fs.statSync(path);
               const sizeInMB = (stats.size / (1024 * 1024)).toFixed(2);
 
-              const comment = `### 📱 Preview APK Ready!\n\n` +
+              const marker = '<!-- android-preview-apk -->';
+
+              const comment = `${marker}\n### 📱 Preview APK Ready!\n\n` +
                 `**Size:** ${sizeInMB} MB\n` +
                 `**Build:** #${{ github.run_id }}\n` +
                 `**Commit:** \`${context.sha.substring(0, 7)}\`\n\n` +
                 `Download the APK from the [Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n` +
                 `> ⚠️ This is a preview build for testing purposes only.`;
 
-              github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: comment
-              });
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                {
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                }
+              );
+
+              const existing = comments.find((c) => c.body.includes(marker));
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  comment_id: existing.id,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: comment
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: comment
+                });
+              }
             }

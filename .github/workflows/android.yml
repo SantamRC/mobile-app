@@ -54,7 +54,7 @@ jobs:
         run: flutter gen-l10n
 
       - name: Build Runner (Generate Dart Files)
-        run: flutter packages pub run build_runner build --delete-conflicting-outputs
+        run: dart run build_runner build --delete-conflicting-outputs
 
       - name: Format Check (Exclude generated files)
         run: |
@@ -127,7 +127,7 @@ jobs:
         run: |
           flutter pub get
           flutter gen-l10n
-          flutter packages pub run build_runner build --delete-conflicting-outputs
+          dart run build_runner build --delete-conflicting-outputs
 
       - name: Build APK Debug
         env:

@@ -216,7 +216,7 @@ jobs:
           flutter clean
           flutter pub get
           flutter gen-l10n
-          flutter packages pub run build_runner build --delete-conflicting-outputs
+          dart run build_runner build --delete-conflicting-outputs
           
       - name: Build Android App Bundle
         env:

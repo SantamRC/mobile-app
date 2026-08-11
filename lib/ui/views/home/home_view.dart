@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:mobile_app/ui/components/cv_outline_button.dart';
 import 'package:mobile_app/ui/components/cv_subheader.dart';
 import 'package:mobile_app/ui/views/base_view.dart';
-import 'package:mobile_app/ui/views/contributors/contributors_view.dart';
 import 'package:mobile_app/ui/views/home/components/feature_card.dart';
+import 'package:mobile_app/ui/views/home/components/growing_community.dart';
 import 'package:mobile_app/ui/views/projects/featured_projects_view.dart';
-import 'package:mobile_app/ui/views/teachers/teachers_view.dart';
 import 'package:mobile_app/viewmodels/cv_landing_viewmodel.dart';
 import 'package:mobile_app/viewmodels/home/home_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -113,6 +111,9 @@ class _HomeViewState extends State<HomeView> {
                   _buildHomePageSketch(),
                   const SizedBox(height: 16),
                   _buildTutorialsAndContestsButtons(),
+                  const SizedBox(height: 16),
+                  GrowingCommunityCard(),
+                  const SizedBox(height: 16),
                   CVSubheader(
                     title: AppLocalizations.of(context)!.features_title,
                     subtitle: AppLocalizations.of(context)!.features_subtitle,

@@ -22,12 +22,13 @@ class GrowingCommunityCard extends StatelessWidget {
         children: [
           Text(
             value,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green[700]),
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[700],
+            ),
           ),
-          Text(
-            label,
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-          ),
+          Text(label, style: TextStyle(fontSize: 16, color: Colors.grey[600])),
         ],
       ),
     );

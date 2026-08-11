@@ -63,40 +63,41 @@ class _HomeViewState extends State<HomeView> {
       );
     }
 
-    Widget _buildTeachersAndContributorButtons() {
-      return Container(
-        margin: const EdgeInsetsDirectional.symmetric(vertical: 24),
-        padding: const EdgeInsetsDirectional.symmetric(horizontal: 16),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isWide = constraints.maxWidth > 500;
-            return Flex(
-              direction: isWide ? Axis.horizontal : Axis.vertical,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CVOutlineButton(
-                  title: AppLocalizations.of(context)!.teachers_button,
-                  isPrimaryDark: true,
-                  onPressed: () => Get.toNamed(TeachersView.id),
-                  isBodyText: true,
-                  leadingIcon: Icons.school,
-                  minWidth: isWide ? 180 : 140,
-                  maxWidth: isWide ? 180 : constraints.maxWidth * 0.8,
-                ),
-                SizedBox(width: isWide ? 16 : 0, height: isWide ? 0 : 12),
-                CVOutlineButton(
-                  title: AppLocalizations.of(context)!.contributors_button,
-                  isPrimaryDark: true,
-                  onPressed: () => Get.toNamed(ContributorsView.id),
-                  isBodyText: true,
-                  leadingIcon: Icons.people_alt,
-                  minWidth: isWide ? 180 : 140,
-                  maxWidth: isWide ? 180 : constraints.maxWidth * 0.8,
-                ),
-              ],
-            );
-          },
-        ),
+    Widget _buildTutorialsAndContestsButtons() {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextButton.icon(
+            onPressed: () {},
+            label: Text('Tutorials', style: TextStyle(color: Colors.white)),
+            icon: Icon(Icons.library_books, color: Colors.white, size: 26),
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(
+                const Color.fromARGB(255, 17, 159, 102),
+              ),
+              minimumSize: WidgetStateProperty.all(Size(150, 40)),
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
+          SizedBox(width: 16),
+          TextButton.icon(
+            onPressed: () {},
+
+            label: Text('Contests', style: TextStyle(color: Colors.white)),
+            icon: Icon(Icons.emoji_events, color: Colors.white, size: 28),
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(
+                const Color.fromARGB(255, 17, 159, 102),
+              ),
+              minimumSize: WidgetStateProperty.all(Size(150, 40)),
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ),
+        ],
       );
     }
 
@@ -110,7 +111,8 @@ class _HomeViewState extends State<HomeView> {
                   _buildHeader(),
                   const SizedBox(height: 16),
                   _buildHomePageSketch(),
-                  _buildTeachersAndContributorButtons(),
+                  const SizedBox(height: 16),
+                  _buildTutorialsAndContestsButtons(),
                   CVSubheader(
                     title: AppLocalizations.of(context)!.features_title,
                     subtitle: AppLocalizations.of(context)!.features_subtitle,

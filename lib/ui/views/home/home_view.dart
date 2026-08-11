@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/ui/components/cv_outline_button.dart';
 import 'package:mobile_app/ui/components/cv_subheader.dart';
 import 'package:mobile_app/ui/views/base_view.dart';
-import 'package:mobile_app/ui/views/home/components/feature_card.dart';
+import 'package:mobile_app/ui/views/home/components/features.dart';
 import 'package:mobile_app/ui/views/home/components/growing_community.dart';
 import 'package:mobile_app/ui/views/projects/featured_projects_view.dart';
 import 'package:mobile_app/viewmodels/cv_landing_viewmodel.dart';
@@ -114,41 +114,7 @@ class _HomeViewState extends State<HomeView> {
                   const SizedBox(height: 16),
                   GrowingCommunityCard(),
                   const SizedBox(height: 16),
-                  CVSubheader(
-                    title: AppLocalizations.of(context)!.features_title,
-                    subtitle: AppLocalizations.of(context)!.features_subtitle,
-                  ),
-                  FeatureCard(
-                    assetPath: 'assets/images/homepage/export-hd.png',
-                    cardHeading: AppLocalizations.of(context)!.feature1_title,
-                    cardDescription:
-                        AppLocalizations.of(context)!.feature1_description,
-                  ),
-                  FeatureCard(
-                    assetPath:
-                        'assets/images/homepage/combinational-analysis.png',
-                    cardHeading: AppLocalizations.of(context)!.feature2_title,
-                    cardDescription:
-                        AppLocalizations.of(context)!.feature2_description,
-                  ),
-                  FeatureCard(
-                    assetPath: 'assets/images/homepage/embed.png',
-                    cardHeading: AppLocalizations.of(context)!.feature3_title,
-                    cardDescription:
-                        AppLocalizations.of(context)!.feature3_description,
-                  ),
-                  FeatureCard(
-                    assetPath: 'assets/images/homepage/sub-circuit.png',
-                    cardHeading: AppLocalizations.of(context)!.feature4_title,
-                    cardDescription:
-                        AppLocalizations.of(context)!.feature4_description,
-                  ),
-                  FeatureCard(
-                    assetPath: 'assets/images/homepage/multi-bit-bus.png',
-                    cardHeading: AppLocalizations.of(context)!.feature5_title,
-                    cardDescription:
-                        AppLocalizations.of(context)!.feature5_description,
-                  ),
+                  FeaturesSection(),
                   const SizedBox(height: 16),
                   CVSubheader(
                     title: AppLocalizations.of(context)!.editor_picks_title,

@@ -116,29 +116,6 @@ class _HomeViewState extends State<HomeView> {
                   const SizedBox(height: 16),
                   FeaturesSection(),
                   const SizedBox(height: 16),
-                  CVSubheader(
-                    title: AppLocalizations.of(context)!.editor_picks_title,
-                    subtitle:
-                        AppLocalizations.of(context)!.editor_picks_subtitle,
-                  ),
-                  const FeaturedProjectsView(embed: true),
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsetsDirectional.symmetric(
-                      horizontal: 16,
-                    ),
-                    child: CVOutlineButton(
-                      title: AppLocalizations.of(context)!.explore_more_button,
-                      isPrimaryDark: true,
-                      onPressed:
-                          () =>
-                              context.read<CVLandingViewModel>().selectedIndex =
-                                  1,
-                      minWidth: 180,
-                      maxWidth: 300,
-                      fontSize: 18,
-                    ),
-                  ),
                 ],
               ),
             ),

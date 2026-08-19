@@ -221,17 +221,17 @@ jobs:
       - name: Build Android App Bundle
         run: |
           # Get version code from run number
-          VERSION_CODE=${{ github.run_number }}
+          VERSION_CODE="$GITHUB_RUN_NUMBER"
           
           # Build the app bundle for Play Store
           flutter build appbundle --release \
-            --build-name=${{ env.VERSION }} \
-            --build-number=$VERSION_CODE
+            --build-name="$VERSION" \
+            --build-number="$VERSION_CODE"
             
           # Also build APK for GitHub release
           flutter build apk --release \
-            --build-name=${{ env.VERSION }} \
-            --build-number=$VERSION_CODE
+            --build-name="$VERSION" \
+            --build-number="$VERSION_CODE"
             
       - name: Install Fastlane dependencies
         working-directory: android

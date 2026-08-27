@@ -16,8 +16,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: Tests
+    uses: ./.github/workflows/test.yml
+    permissions:
+      contents: read
+      checks: write
+
   build-ios:
     name: Build iOS Debug
+    needs: test
     runs-on: macos-15
     timeout-minutes: 45
     steps:

@@ -17,8 +17,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: Tests
+    uses: ./.github/workflows/test.yml
+    permissions:
+      contents: read
+      checks: write
+
   build-web:
     name: Build Web
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

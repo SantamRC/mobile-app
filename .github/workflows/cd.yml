@@ -31,9 +31,21 @@ permissions:
 env:
   FLUTTER_VERSION: "3.47.0"
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
+  test:
+    name: Tests
+    uses: ./.github/workflows/test.yml
+    permissions:
+      contents: read
+      checks: write
+
   release:
     name: Create Release
+    needs: test
     runs-on: ubuntu-latest
     outputs:
       new_release_published: ${{ steps.semantic.outputs.new_release_published }}
@@ -71,60 +83,6 @@ jobs:
             semantic-release-pub \
             conventional-changelog-conventionalcommits
       
-      - name: Create semantic-release config
-        run: |
-          cat > .releaserc.json << 'EOF'
-          {
-            "branches": ["master", "main"],
-            "plugins": [
-              ["@semantic-release/commit-analyzer", {
-                "preset": "conventionalcommits",
-                "releaseRules": [
-                  {"type": "feat", "release": "minor"},
-                  {"type": "fix", "release": "patch"},
-                  {"type": "perf", "release": "patch"},
-                  {"type": "refactor", "release": "patch"},
-                  {"breaking": true, "release": "major"}
-                ]
-              }],
-              ["@semantic-release/release-notes-generator", {
-                "preset": "conventionalcommits",
-                "presetConfig": {
-                  "types": [
-                    {"type": "feat", "section": "✨ Features"},
-                    {"type": "fix", "section": "🐛 Bug Fixes"},
-                    {"type": "perf", "section": "⚡ Performance Improvements"},
-                    {"type": "refactor", "section": "♻️ Code Refactoring"},
-                    {"type": "docs", "section": "📚 Documentation"},
-                    {"type": "style", "section": "💎 Styles"},
-                    {"type": "test", "section": "🧪 Tests"},
-                    {"type": "build", "section": "📦 Build System"},
-                    {"type": "ci", "section": "🎡 CI"}
-                  ]
-                }
-              }],
-              ["@semantic-release/changelog", {
-                "changelogFile": "CHANGELOG.md",
-                "changelogTitle": "# Changelog\n\nAll notable changes to this project will be documented in this file."
-              }],
-              ["semantic-release-pub", {
-                "cli": "flutter",
-                "publishPub": false,
-                "updateBuildNumber": true
-              }],
-              ["@semantic-release/github", {
-                "assets": [],
-                "successComment": false,
-                "failComment": false
-              }],
-              ["@semantic-release/git", {
-                "assets": ["CHANGELOG.md", "pubspec.yaml"],
-                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-              }]
-            ]
-          }
-          EOF
-          
       - name: Run Semantic Release
         id: semantic
         env:
@@ -169,24 +127,28 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: '3.3'
           working-directory: android
           bundler-cache: true
           
       - name: Setup signing credentials
+        env:
+          SUPPLY_JSON_KEY: ${{ secrets.FASTLANE_SUPPLY_JSON_KEY }}
+          KEYSTORE_PROPERTIES: ${{ secrets.RELEASE_KEYSTORE_PROPERTIES }}
+          KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
         run: |
           # Create directories if they don't exist
           mkdir -p android/app
-          
+
           # Decode and save Play Store service account key
-          echo "${{ secrets.FASTLANE_SUPPLY_JSON_KEY }}" | base64 --decode > android/supply_json_key.json
-          
+          printf '%s' "$SUPPLY_JSON_KEY" | base64 --decode > android/supply_json_key.json
+
           # Decode and save keystore properties
-          echo "${{ secrets.RELEASE_KEYSTORE_PROPERTIES }}" | base64 --decode > android/key.properties
-          
+          printf '%s' "$KEYSTORE_PROPERTIES" | base64 --decode > android/key.properties
+
           # Decode and save keystore file
-          echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 --decode > android/app/cv_release.jks
-          
+          printf '%s' "$KEYSTORE" | base64 --decode > android/app/cv_release.jks
+
           # Verify files were created
           ls -la android/supply_json_key.json
           ls -la android/key.properties
@@ -223,8 +185,10 @@ jobs:
           
       - name: Build Android App Bundle
         run: |
-          # Get version code from run number
-          VERSION_CODE="$GITHUB_RUN_NUMBER"
+          # Derive a monotonic version code from the semantic version so it
+          # never regresses if the workflow is renamed and run_number resets
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          VERSION_CODE=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
           
           # Build the app bundle for Play Store
           flutter build appbundle --release \

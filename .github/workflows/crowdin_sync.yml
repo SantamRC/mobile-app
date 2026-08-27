@@ -3,19 +3,28 @@ name: Sync crowdin translation
 on:
   push:
     paths: # run action automatically when app_en.arb file is changed
-      - 'lib/l10n/arb/app_en.arb'
-    branches: [ main ]
+      - 'lib/l10n/app_en.arb'
+    branches: [ master ]
   schedule:
     - cron: '0 */12 * * *'
   workflow_dispatch: 
 
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   synchronize-with-crowdin:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: crowdin action
         uses: crowdin/github-action@v2

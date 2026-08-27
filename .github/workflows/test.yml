@@ -13,6 +13,9 @@ concurrency:
   group: ${{ github.workflow }}-test-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  FLUTTER_VERSION: "3.47.0"
+
 jobs:
   test:
     name: Test & Analyze
@@ -37,7 +40,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: 3.47.0
+          flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: Cache pub dependencies
         uses: actions/cache@v6

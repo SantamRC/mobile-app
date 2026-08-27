@@ -28,6 +28,9 @@ permissions:
   issues: write # for issue comments
   pull-requests: write # for PR comments
 
+env:
+  FLUTTER_VERSION: "3.47.0"
+
 jobs:
   release:
     name: Create Release
@@ -52,7 +55,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: 3.47.0
+          flutter-version: ${{ env.FLUTTER_VERSION }}
 
           
       - name: Install semantic-release and plugins
@@ -155,7 +158,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          flutter-version: 3.47.0
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           
       - name: Set up Java
         uses: actions/setup-java@v5

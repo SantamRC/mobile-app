@@ -110,7 +110,12 @@ jobs:
                 }
               );
 
-              const existing = comments.find((c) => c.body.includes(marker));
+              // Only ever update this workflow's own comment, never a participant's
+              const existing = comments.find(
+                (c) => c.user.type === 'Bot' &&
+                  c.user.login === 'github-actions[bot]' &&
+                  c.body.includes(marker)
+              );
 
               if (existing) {
                 await github.rest.issues.updateComment({

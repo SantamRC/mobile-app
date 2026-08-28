@@ -184,21 +184,30 @@ jobs:
           dart run build_runner build --delete-conflicting-outputs
           
       - name: Build Android App Bundle
+        id: build
+        env:
+          GH_OAUTH_CLIENT_ID: ${{ secrets.GH_OAUTH_CLIENT_ID }}
+          GH_OAUTH_CLIENT_SECRET: ${{ secrets.GH_OAUTH_CLIENT_SECRET }}
         run: |
           # Derive a monotonic version code from the semantic version so it
           # never regresses if the workflow is renamed and run_number resets
           IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
           VERSION_CODE=$((MAJOR * 1000000 + MINOR * 1000 + PATCH))
-          
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+
           # Build the app bundle for Play Store
           flutter build appbundle --release \
             --build-name="$VERSION" \
-            --build-number="$VERSION_CODE"
-            
+            --build-number="$VERSION_CODE" \
+            --dart-define=GITHUB_OAUTH_CLIENT_ID="$GH_OAUTH_CLIENT_ID" \
+            --dart-define=GITHUB_OAUTH_CLIENT_SECRET="$GH_OAUTH_CLIENT_SECRET"
+
           # Also build APK for GitHub release
           flutter build apk --release \
             --build-name="$VERSION" \
-            --build-number="$VERSION_CODE"
+            --build-number="$VERSION_CODE" \
+            --dart-define=GITHUB_OAUTH_CLIENT_ID="$GH_OAUTH_CLIENT_ID" \
+            --dart-define=GITHUB_OAUTH_CLIENT_SECRET="$GH_OAUTH_CLIENT_SECRET"
             
       - name: Install Fastlane dependencies
         working-directory: android
@@ -241,7 +250,7 @@ jobs:
             
             ### 📊 Build Information
             - **Version:** ${{ env.VERSION }}
-            - **Build Number:** ${{ github.run_number }}
+            - **Build Number:** ${{ steps.build.outputs.version_code }}
             - **Commit:** [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})
             - **Track:** ${{ github.event.inputs.track }}
             
@@ -272,7 +281,7 @@ jobs:
           echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
           echo "|----------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| **Version** | v${{ env.VERSION }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Build Number** | ${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| **Build Number** | ${{ steps.build.outputs.version_code }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Track** | ${{ github.event.inputs.track }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **APK Size** | ${{ steps.apk_size.outputs.size }} |" >> $GITHUB_STEP_SUMMARY
           echo "| **Status** | ✅ Success |" >> $GITHUB_STEP_SUMMARY

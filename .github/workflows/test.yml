@@ -61,14 +61,15 @@ jobs:
 
       - name: Format Check (Exclude generated files)
         run: |
-          dart format --set-exit-if-changed \
-            $(find . -name "*.dart" \
-              -not -path "./lib/gen_l10n/*" \
-              -not -path "./.dart_tool/*" \
-              -not -path "./build/*" \
-              -not -name "*.g.dart" \
-              -not -name "*.freezed.dart" \
-              -not -name "*.mocks.dart")
+          find . -name "*.dart" \
+            -not -path "./lib/gen_l10n/*" \
+            -not -path "./.dart_tool/*" \
+            -not -path "./build/*" \
+            -not -name "*.g.dart" \
+            -not -name "*.freezed.dart" \
+            -not -name "*.mocks.dart" \
+            -print0 |
+            xargs -0 -r dart format --set-exit-if-changed
 
       - name: Analyze Code
         run: flutter analyze
